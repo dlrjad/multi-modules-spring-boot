@@ -25,6 +25,12 @@ public class Banca {
     this.type = type;
     this.amount = amount;
   }
+  
+  public Banca(String client, String type, Integer amount) {
+    this.client = client;
+    this.type = type;
+    this.amount = amount;
+  }
 
 
   public Integer getId() {
