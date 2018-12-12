@@ -8,7 +8,7 @@ public class BancaNotFoundException extends RuntimeException {
   private static final long serialVersionUID = -7295910574475009536L;
 
   public BancaNotFoundException() {
-    super("No existe ningún usuario");
+    super("Cuenta inexistente");
   }
   public BancaNotFoundException(Integer id) {
     super(String.format("No existe ningún usuario con el ID = %d", id));
