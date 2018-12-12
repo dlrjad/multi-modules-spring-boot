@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = {"persistence"})
 @EntityScan(basePackages = {"model"})
-@ComponentScan(basePackages = {"persistence", "model", "controller"})
+@ComponentScan(basePackages = {"persistence", "model", "controller", "services"})
 public class BancaApplication {
 
 	public static void main(String[] args) {

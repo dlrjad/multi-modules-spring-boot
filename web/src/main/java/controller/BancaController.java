@@ -1,5 +1,10 @@
 package controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -16,103 +21,86 @@ import org.springframework.web.bind.annotation.RestController;
 import exceptions.BancaNotFoundException;
 import exceptions.ErrorRest;
 import model.Banca;
-import persistence.BancaRepository;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletResponse;
-
+import services.BankService;
 
 @RestController
-@RequestMapping(path="/api")
-public class BancaController{
-  private BancaRepository bancaRepository;
+@RequestMapping(path = "/api")
+public class BancaController {
 
-  public BancaController(BancaRepository bancaRepository) {
-    this.bancaRepository = bancaRepository;
-  }
-
+  @Autowired
+  private BankService service;
 
   @CrossOrigin(origins = "http://localhost:4200")
-  @GetMapping(path="/bancos")
+  @GetMapping(path = "/bancos")
   public List<Banca> getHotels() {
-    List<Banca> bancas = this.bancaRepository.findAll();
-    return bancas;
+    return this.service.getAllBanks();
   }
-  
+
   @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping("/banco/{id}")
   public ResponseEntity<?> getUserById(@PathVariable Integer id, HttpServletResponse response) {
+    ResponseEntity<?> res = null;
     try {
-      Banca result = bancaRepository.findById(id).get();
-      return new ResponseEntity<Banca>(result, HttpStatus.OK);
-    } catch(Exception e) {
-      if(e.getMessage().equals("No value present")) {
-        throw new BancaNotFoundException(id);
+      Banca founded = this.service.getAccountById(id);
+      if (founded != null) {
+        res = new ResponseEntity<Banca>(this.service.getAccountById(id), HttpStatus.OK);
       } else {
-        return new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.BAD_REQUEST);
+        res = new ResponseEntity<ErrorRest>(new ErrorRest(), HttpStatus.NOT_FOUND);
       }
+    } catch (Exception e) {
+      res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    return res;
   }
-  
+
   @CrossOrigin(origins = "http://localhost:4200")
   @PostMapping("/banco")
   public ResponseEntity<?> createUser(@RequestBody Banca banca, HttpServletResponse response) {
-    if (banca.equals(null)) {
-      return new ResponseEntity<ErrorRest>(new ErrorRest("Formato de peticion incorrecto. Debe enviar los datos del banco a crear"), HttpStatus.BAD_REQUEST);
+    ResponseEntity<?> res = null;
+    if (banca == null) {
+      return new ResponseEntity<ErrorRest>(
+          new ErrorRest("Formato de peticion incorrecto. Debe enviar los datos del banco a crear"),
+          HttpStatus.BAD_REQUEST);
     }
     try {
-        Banca newBanca = new Banca(
-          banca.getClient(),
-          banca.getType(),
-          banca.getAmount()
-        );
-        return new ResponseEntity<Banca>(bancaRepository.save(newBanca), HttpStatus.OK);
-
-    } catch(Exception e) {
-      return new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.METHOD_NOT_ALLOWED);
+      res = new ResponseEntity<Banca>(this.service.createAccount(banca),HttpStatus.OK);
+    } catch (Exception e) {
+      res = new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    return res;
   }
-  
+
   @CrossOrigin(origins = "http://localhost:4200")
   @PutMapping("/banco/{id}")
   public ResponseEntity<?> updateUser(@PathVariable Integer id, RequestEntity<Banca> reqBanca) {
-    if (reqBanca.getBody().equals(null)) {
-      return new ResponseEntity<ErrorRest>(new ErrorRest("Formato de peticion incorrecto. Debe enviar los datos del banco a modificar"), HttpStatus.METHOD_NOT_ALLOWED);
-    } 
-    try {
-      Optional<Banca> aux = bancaRepository.findById(id);
-      if (aux.isPresent()) {
-        Banca bancaUpdate = aux.get();
-        bancaUpdate.setClient(reqBanca.getBody().getClient());
-        bancaUpdate.setType(reqBanca.getBody().getType());
-        bancaUpdate.setAmount(reqBanca.getBody().getAmount());
-        return new ResponseEntity<Banca>(bancaRepository.save(bancaUpdate), HttpStatus.OK);
-      } else {
-        throw new BancaNotFoundException(id);
-      }
-    } catch(Exception e) {
-      if(e.getMessage().equals("No value present")) {
-        throw new BancaNotFoundException(id);
-      }
-      return new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.BAD_REQUEST);
+    ResponseEntity<?> res = null;
+    if (reqBanca.getBody() == null) {
+      return new ResponseEntity<ErrorRest>(
+          new ErrorRest("Formato de peticion incorrecto. Debe enviar los datos del banco a modificar"),
+          HttpStatus.BAD_REQUEST);
     }
+    try {
+      res = new ResponseEntity<Banca>(this.service.updateAccount(reqBanca.getBody()), HttpStatus.OK);
+    } catch (BancaNotFoundException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return res;
   }
-  
+
   @CrossOrigin(origins = "http://localhost:4200")
   @DeleteMapping("/banco/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+    ResponseEntity<?> res = null;
     try {
-      Banca bancaDelete = bancaRepository.findById(id).get();
-      bancaRepository.delete(bancaDelete);
-      return new ResponseEntity<Banca>(bancaDelete, HttpStatus.OK);
-    } catch(Exception e) {
-      if(e.getMessage().equals("No value present")) {
-        throw new BancaNotFoundException(id);
-      } 
-      return new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.BAD_REQUEST);
+      res = new ResponseEntity<String>(this.service.removeAccount(id), HttpStatus.OK);
+    } catch (BancaNotFoundException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    return res;
   }
 
 }
