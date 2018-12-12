@@ -13,20 +13,20 @@ public class Banca {
 	private Integer id;
 	private String client;
 	private String type;
-  private Integer amount;
+  private Double amount;
 
 
   public Banca() {
   }
 
-  public Banca(Integer id, String client, String type, Integer amount) {
+  public Banca(Integer id, String client, String type, Double amount) {
     this.id = id;
     this.client = client;
     this.type = type;
     this.amount = amount;
   }
   
-  public Banca(String client, String type, Integer amount) {
+  public Banca(String client, String type, Double amount) {
     this.client = client;
     this.type = type;
     this.amount = amount;
@@ -57,11 +57,11 @@ public class Banca {
     this.type = type;
   }
 
-  public Integer getAmount() {
+  public Double getAmount() {
     return this.amount;
   }
 
-  public void setAmount(Integer amount) {
+  public void setAmount(Double amount) {
     this.amount = amount;
   }
   
