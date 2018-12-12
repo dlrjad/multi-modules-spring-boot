@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import exceptions.BancaNotFoundException;
+import exceptions.TransferException;
 import model.Banca;
+import model.Transfer;
 import persistence.BancaRepository;
 
 import java.util.List;
@@ -63,5 +65,33 @@ public class BankService {
 
     public List<Banca> getType(String type) {
         return this.repo.findByType(type);
+    }
+    /**
+     * Realiza una transferencia entre dos cuentas
+     * @param fromAccount
+     * @param toAccount
+     * @param totalAmount
+     */
+    public void moneyTransfer(Transfer transferRequest) throws BancaNotFoundException,TransferException, Exception{
+        Banca from = this.getAccountById(transferRequest.getFromAccount());
+        Banca to = this.getAccountById(transferRequest.getToAccount());
+        if(from == null || to == null){
+            throw new BancaNotFoundException();
+        }
+        if(from.equals(to)){
+            throw new TransferException("no puedes transferir dinero a tu propia cuenta");
+        }
+        if(transferRequest.getMoneyToTransfer() == 0D){
+            throw new TransferException("La cantidad es inválida");
+        }
+
+        try {
+            from.setAmount(from.getAmount() - transferRequest.getMoneyToTransfer());
+            to.setAmount(to.getAmount() + transferRequest.getMoneyToTransfer());
+            this.repo.save(from);
+            this.repo.save(to);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
