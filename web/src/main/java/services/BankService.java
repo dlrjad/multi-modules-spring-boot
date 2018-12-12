@@ -60,4 +60,8 @@ public class BankService {
         }
         return resu;
     }
+
+    public List<Banca> getType(String type) {
+        return this.repo.findByType(type);
+    }
 }

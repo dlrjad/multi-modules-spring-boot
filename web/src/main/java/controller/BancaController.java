@@ -103,4 +103,18 @@ public class BancaController {
     return res;
   }
 
+  @CrossOrigin(origins = "http://localhost:4200")
+  @GetMapping("/bancos/{type}")
+  public ResponseEntity<?> getType(@PathVariable String type, RequestEntity<Banca> reqBanca) {
+    ResponseEntity<?> res = null;
+    try {
+      res = new ResponseEntity<List<Banca>>(this.service.getType(type), HttpStatus.OK);
+    } catch (BancaNotFoundException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return res;
+  }
+
 }
