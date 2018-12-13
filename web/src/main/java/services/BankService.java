@@ -97,6 +97,15 @@ public class BankService {
     }
 
 
+    /**
+     * Operaciones de deposito y extraccion de efectivo para la cuenta especificada
+     * @param accountId
+     * @param canti
+     * @return
+     * @throws BancaNotFoundException
+     * @throws WithoutFoundsException
+     * @throws Exception
+     */
     public Banca accountOps(Integer accountId, Double canti) throws BancaNotFoundException, WithoutFoundsException, Exception{
         Banca account = this.getAccountById(accountId);
         if(account == null){
@@ -106,18 +115,10 @@ public class BankService {
         if(canti > 0){
             account.depositMoney(canti);
         }else{
-            try {
-                account.withdrawMoney(canti * -1D);
-            } catch (WithoutFoundsException e) {
-                throw e;
-            }
+            account.withdrawMoney(canti * -1D);
         }
 
-        try {
-            this.repo.save(account);
-        } catch (Exception e) {
-            throw e;
-        }
+        this.repo.save(account);
         return account;
     }
 }
