@@ -91,8 +91,8 @@ public class BankService {
         }
 
         try {
-            from.setAmount(from.getAmount() - transferRequest.getMoneyToTransfer());
-            to.setAmount(to.getAmount() + transferRequest.getMoneyToTransfer());
+            from.withdrawMoney(transferRequest.getMoneyToTransfer());
+            to.depositMoney(transferRequest.getMoneyToTransfer());
             this.repo.save(from);
             this.repo.save(to);
         } catch (Exception e) {
