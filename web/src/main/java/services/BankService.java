@@ -90,14 +90,10 @@ public class BankService {
             throw new TransferException("las cuentas de tipo ahorro no permiten esta operacion");
         }
 
-        try {
-            from.withdrawMoney(transferRequest.getMoneyToTransfer());
-            to.depositMoney(transferRequest.getMoneyToTransfer());
-            this.repo.save(from);
-            this.repo.save(to);
-        } catch (Exception e) {
-            throw e;
-        }
+        from.withdrawMoney(transferRequest.getMoneyToTransfer());
+        to.depositMoney(transferRequest.getMoneyToTransfer());
+        this.repo.save(from);
+        this.repo.save(to);
     }
 
 
