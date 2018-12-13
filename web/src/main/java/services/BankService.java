@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import exceptions.BancaNotFoundException;
 import exceptions.TransferException;
+import exceptions.WithoutFoundsException;
 import model.Banca;
 import model.Transfer;
 import persistence.BancaRepository;
@@ -97,5 +98,30 @@ public class BankService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+
+    public Banca accountOps(Integer accountId, Double canti) throws BancaNotFoundException, WithoutFoundsException, Exception{
+        Banca account = this.getAccountById(accountId);
+        if(account == null){
+            throw new BancaNotFoundException();
+        }
+
+        if(canti > 0){
+            account.depositMoney(canti);
+        }else{
+            try {
+                account.withdrawMoney(canti * -1D);
+            } catch (WithoutFoundsException e) {
+                throw e;
+            }
+        }
+
+        try {
+            this.repo.save(account);
+        } catch (Exception e) {
+            throw e;
+        }
+        return account;
     }
 }
