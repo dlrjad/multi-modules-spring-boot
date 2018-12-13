@@ -82,7 +82,11 @@ public class BankService {
             throw new TransferException("no puedes transferir dinero a tu propia cuenta");
         }
         if(transferRequest.getMoneyToTransfer() == 0D){
-            throw new TransferException("La cantidad es inválida");
+            throw new TransferException("la cantidad es inválida");
+        }
+        
+        if(from.getType().equals("Ahorro") || to.getType().equals("Ahorro")){
+            throw new TransferException("las cuentas de tipo ahorro no permiten esta operacion");
         }
 
         try {
