@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import exceptions.BancaNotFoundException;
 import exceptions.ErrorRest;
+import exceptions.WithoutFoundsException;
 import model.Banca;
+import model.Transfer;
 import services.BankService;
 
 @RestController
@@ -73,9 +75,9 @@ public class BancaController {
           HttpStatus.BAD_REQUEST);
     }
     try {
-      res = new ResponseEntity<Banca>(this.service.createAccount(banca),HttpStatus.OK);
+      res = new ResponseEntity<Banca>(this.service.createAccount(banca), HttpStatus.OK);
     } catch (Exception e) {
-      res = new ResponseEntity<String>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+      res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return res;
   }
@@ -92,7 +94,7 @@ public class BancaController {
     try {
       res = new ResponseEntity<Banca>(this.service.updateAccount(reqBanca), HttpStatus.OK);
     } catch (BancaNotFoundException e) {
-      res = new ResponseEntity<ErrorRest>(new ErrorRest(), HttpStatus.NOT_FOUND);
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.NOT_FOUND);
     } catch (Exception e) {
       res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -109,6 +111,20 @@ public class BancaController {
     	}
       res = new ResponseEntity<String>(this.service.removeAccount(id), HttpStatus.OK);
     } catch (BancaNotFoundException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      res = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return res;
+  }
+
+  @CrossOrigin(origins = "http://localhost:4200")
+  @GetMapping("/bancos/{type}")
+  public ResponseEntity<?> getType(@PathVariable String type, RequestEntity<Banca> reqBanca) {
+    ResponseEntity<?> res = null;
+    try {
+      res = new ResponseEntity<List<Banca>>(this.service.getType(type), HttpStatus.OK);
+    } catch (BancaNotFoundException e) {
       res = new ResponseEntity<ErrorRest>(new ErrorRest(), HttpStatus.NOT_FOUND);
     } catch (RuntimeException e) {
     	res = new ResponseEntity<String>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -118,4 +134,35 @@ public class BancaController {
     return res;
   }
 
+  @CrossOrigin(origins = "http://localhost:4200")
+  @PutMapping("/banco/transfers")
+  public ResponseEntity<?> transfer(RequestEntity<Transfer> transferRequest) {
+    ResponseEntity<?> res = null;
+    try {
+      this.service.moneyTransfer(transferRequest.getBody());
+      res = new ResponseEntity<String>("Transferencia realizada con exito", HttpStatus.OK);
+    } catch (BancaNotFoundException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return res;
+  }
+
+  @CrossOrigin(origins = "http://localhost:4200")
+  @PutMapping("/banco/{account}/ops/{canti}")
+  public ResponseEntity<?> ops(@PathVariable Integer account, @PathVariable Double canti) {
+    ResponseEntity<?> res = null;
+    try {
+      res = new ResponseEntity<Banca>(this.service.accountOps(account, canti), HttpStatus.OK);
+    } catch (WithoutFoundsException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (BancaNotFoundException e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return res;
+  }
 }

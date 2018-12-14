@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import exceptions.BancaNotFoundException;
+import exceptions.TransferException;
+import exceptions.WithoutFoundsException;
 import model.Banca;
+import model.Transfer;
 import persistence.BancaRepository;
 
 import java.util.List;
@@ -63,5 +66,63 @@ public class BankService {
             throw e;
         }
         return resu;
+    }
+
+    public List<Banca> getType(String type) {
+        return this.repo.findByType(type);
+    }
+    /**
+     * Realiza una transferencia entre dos cuentas
+     * @param fromAccount
+     * @param toAccount
+     * @param totalAmount
+     */
+    public void moneyTransfer(Transfer transferRequest) throws BancaNotFoundException,TransferException, Exception{
+        Banca from = this.getAccountById(transferRequest.getFromAccount());
+        Banca to = this.getAccountById(transferRequest.getToAccount());
+        if(from == null || to == null){
+            throw new BancaNotFoundException();
+        }
+        if(from.equals(to)){
+            throw new TransferException("no puedes transferir dinero a tu propia cuenta");
+        }
+        if(transferRequest.getMoneyToTransfer() == 0D){
+            throw new TransferException("la cantidad es inválida");
+        }
+        
+        if(from.getType().equals("Ahorro") || to.getType().equals("Ahorro")){
+            throw new TransferException("las cuentas de tipo ahorro no permiten esta operacion");
+        }
+
+        from.withdrawMoney(transferRequest.getMoneyToTransfer());
+        to.depositMoney(transferRequest.getMoneyToTransfer());
+        this.repo.save(from);
+        this.repo.save(to);
+    }
+
+
+    /**
+     * Operaciones de deposito y extraccion de efectivo para la cuenta especificada
+     * @param accountId
+     * @param canti
+     * @return
+     * @throws BancaNotFoundException
+     * @throws WithoutFoundsException
+     * @throws Exception
+     */
+    public Banca accountOps(Integer accountId, Double canti) throws BancaNotFoundException, WithoutFoundsException, Exception{
+        Banca account = this.getAccountById(accountId);
+        if(account == null){
+            throw new BancaNotFoundException();
+        }
+
+        if(canti > 0){
+            account.depositMoney(canti);
+        }else{
+            account.withdrawMoney(canti * -1D);
+        }
+
+        this.repo.save(account);
+        return account;
     }
 }
