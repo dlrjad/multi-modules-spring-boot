@@ -13,32 +13,39 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import exceptions.BancaNotFoundException;
+import exceptions.TransferException;
+import exceptions.WithoutFoundsException;
+import model.Banca;
+import model.Transfer;
 import persistence.BancaRepository;
 import services.BankService;
-
-import model.Banca;
-
 
 public class BankServicesUnitTest {
 
   private BancaRepository bankRepository;
-  private BankService  bankServices;
-  
+  private BankService bankServices;
+
   private List<Banca> banks = new ArrayList<>();
 
   @Before
   public void setUp() {
-	banks.add( new Banca(1, "Santander", "Corriente", 9200.5));
+    banks.add(new Banca(1, "Santander", "Corriente", 9200.5));
+    banks.add(new Banca(2, "BBVA", "Corriente", 1000D));
+    banks.add(new Banca(3, "La Caixa", "Ahorro", 1050D));
     bankRepository = Mockito.mock(BancaRepository.class);
     when(bankRepository.findAll()).thenReturn(banks);
     when(bankRepository.findById(1)).thenReturn(Optional.of(this.banks.get(0)));
+    when(bankRepository.findById(2)).thenReturn(Optional.of(this.banks.get(1)));
+    when(bankRepository.findById(3)).thenReturn(Optional.of(this.banks.get(2)));
     bankServices = new BankService(bankRepository);
   }
 
   @Test
   public void itShoulGetAllBanks() {
     List<Banca> banks = bankServices.getAllBanks();
-    Assert.assertEquals(1, banks.size());
+    if (this.banks.size() < 1) {
+      fail("There are accounts");
+    }
   }
 
   @Test
@@ -71,9 +78,9 @@ public class BankServicesUnitTest {
     try {
       bankServices.createAccount(newBank);
       fail("Fail test");
-    } catch(Exception e) {
-    	Assert.assertEquals(Exception.class, e.getClass());
-    } 
+    } catch (Exception e) {
+      Assert.assertEquals(Exception.class, e.getClass());
+    }
   }
 
   @Test
@@ -92,10 +99,10 @@ public class BankServicesUnitTest {
     try {
       bankServices.updateAccount(updatedBank);
       fail("Fail test");
-    } catch(Exception e) {
+    } catch (Exception e) {
       Assert.assertEquals(BancaNotFoundException.class, e.getClass());
     }
-    
+
   }
 
   @Test
@@ -111,8 +118,162 @@ public class BankServicesUnitTest {
     try {
       bankServices.removeAccount(id);
       fail("Fail test");
-    }catch(Exception e) {
+    } catch (Exception e) {
       Assert.assertEquals(BancaNotFoundException.class, e.getClass());
+    }
+  }
+
+  /* Filter accounts by type tests */
+  @Test
+  public void itShouldGetAccountType() {
+    String type = "Ahorro";
+    List<Banca> results = new ArrayList<>();
+    results.add(new Banca(3, "BBVA", "Ahorro", 14000D));
+    when(this.bankRepository.findByType(type)).thenReturn(results);
+    List<Banca> repositoryAccounts = this.bankServices.getType(type);
+    Assert.assertEquals(results, repositoryAccounts);
+  }
+
+  /* Money transfer tests */
+  @Test
+  public void itShouldBeTransferMoneyBetweenAccounts() throws BancaNotFoundException, TransferException, Exception {
+    Transfer transferData = new Transfer(1, 2, 200D);
+    this.bankServices.moneyTransfer(transferData);
+    Assert.assertEquals((Double) 1200D, this.bankRepository.findById(2).get().getAmount());
+  }
+
+  @Test
+  public void itshouldBeFailFromAccountType() {
+    Transfer transferData = new Transfer(3, 2, 200D);
+    try {
+      this.bankServices.moneyTransfer(transferData);
+      fail();
+    } catch (TransferException e) {
+      Assert.assertEquals(
+          "La transferencia no pudo completarse porque las cuentas de tipo ahorro no permiten esta operacion",
+          e.getMessage());
+    } catch (Exception e) {
+      fail();
+    }
+  }
+
+  @Test
+  public void itshouldBeFailToAccountType() {
+    Transfer transferData = new Transfer(2, 3, 200D);
+    try {
+      this.bankServices.moneyTransfer(transferData);
+      fail("This test must to fail");
+    } catch (TransferException e) {
+      Assert.assertEquals(
+          "La transferencia no pudo completarse porque las cuentas de tipo ahorro no permiten esta operacion",
+          e.getMessage());
+    } catch (Exception e) {
+      fail("This isn't correct exception");
+    }
+  }
+
+  @Test
+  public void itShouldFailNonExistFromAccount() {
+    Transfer transferData = new Transfer(5, 1, 150D);
+    try {
+      this.bankServices.moneyTransfer(transferData);
+      fail("This test must to fail");
+    } catch (BancaNotFoundException e) {
+      // test OK
+    } catch (Exception e) {
+      fail("This isn't correct exception");
+    }
+  }
+
+  @Test
+  public void itShouldFailNonExistToAccount() {
+    Transfer transferData = new Transfer(1, 5, 150D);
+    try {
+      this.bankServices.moneyTransfer(transferData);
+      fail("This test must to fail");
+    } catch (BancaNotFoundException e) {
+      // test OK
+    } catch (Exception e) {
+      fail("This isn't correct exception");
+    }
+  }
+
+  @Test
+  public void itShouldFailInvalidAmount() {
+    Transfer transferData = new Transfer(1, 2, 0D);
+    try {
+      this.bankServices.moneyTransfer(transferData);
+      fail("this test must to fail");
+    } catch (TransferException e) {
+      Assert.assertEquals("La transferencia no pudo completarse porque la cantidad es inválida", e.getMessage());
+    } catch (Exception e) {
+      fail("This isn't correct exception");
+    }
+  }
+
+  @Test
+  public void itShouldFailSameAccountTo() {
+    Transfer transferData = new Transfer(1, 1, 200D);
+    try {
+      this.bankServices.moneyTransfer(transferData);
+      fail("This test must to fail");
+    } catch (TransferException e) {
+      Assert.assertEquals("La transferencia no pudo completarse porque no puedes transferir dinero a tu propia cuenta",
+          e.getMessage());
+    } catch (Exception e) {
+      fail("This isn't correct exception");
+    }
+  }
+
+  /* Accounts operations tests */
+
+  @Test
+  public void itShouldOKDepositmoney() throws BancaNotFoundException, WithoutFoundsException, Exception {
+    Banca updatedValues = this.bankServices.accountOps(2, 20D);
+    Double expected = 1020D;
+    Assert.assertEquals(expected, updatedValues.getAmount());
+  }
+
+  @Test
+  public void itShouldOKWithdrawMoney() throws BancaNotFoundException, WithoutFoundsException, Exception {
+    Banca updatedValues = this.bankServices.accountOps(2, -20D);
+    Double expected = 980D;
+    Assert.assertEquals(expected, updatedValues.getAmount());
+  }
+
+  @Test
+  public void itShouldFailNonExistAccount() {
+    try {
+      this.bankServices.accountOps(5, 50D);
+      fail("This test must fail");
+    } catch (BancaNotFoundException e) {
+      // test OK
+    } catch (Exception e) {
+      fail("This isn't correct exception");
+    }
+  }
+
+  @Test
+  public void itShouldFailInvalidWithdrawAmountAhorroType() {
+    try {
+      this.bankServices.accountOps(3, -2000D);
+      fail("This test must fail");
+    } catch (WithoutFoundsException e) {
+      // test OK
+    } catch (Exception e) {
+      fail("This isn' correct exception");
+    }
+  }
+
+  @Test
+  public void itShouldFailInvalidWithdrawAmountCorrienteType() {
+    try {
+      this.bankServices.accountOps(2, -2050D);
+      fail("This test must fail");
+    } catch (WithoutFoundsException e) {
+      // test OK
+    } catch (Exception e) {
+      fail("This isn' correct exception");
     }
   }
 
