@@ -1,39 +1,36 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name="Banca")
+@Table(name = "Banca")
 public class Banca {
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-	private Integer id;
-	private String client;
-	private String type;
-  private Integer amount;
-  
+  @Column(name = "id", unique = true, nullable = false)
+  protected Integer id;
 
-  @OneToMany(mappedBy = "banca", cascade = CascadeType.ALL, orphanRemoval = true) // mapped by va a la variable banca creada en interes
-  //@JoinColumn(name = "banca_interes", referencedColumnName = "id", nullable = false)
-  //@JoinTable(name ="banca_interes", joinColumns={@JoinColumn( name ="id")}, inverseJoinColumns = {@JoinColumn(name = "id_interes")})
-  //@OneToMany(mappedBy = "banca")
-  protected List<Interes> banca_interes = new ArrayList<>();
+  @Column(name = "client")
+  protected String client;
+  @Column(name = "type")
+  protected String type;
+  @Column(name = "amount")
+  protected Integer amount;
 
+  @Column(name = "banca_interes")
+  @OneToMany(mappedBy = "banca", cascade = CascadeType.ALL, fetch = FetchType.EAGER) // mapped by va a la variable banca
+  protected List<Interes> banca_interes; // creada en interes
 
   public Banca() {
     this.id = 0;
@@ -43,21 +40,21 @@ public class Banca {
     this.banca_interes = null;
   }
 
-  public Banca(Integer id, String client, String type, Integer amount,Interes j) {
+  public Banca(Integer id, String client, String type, Integer amount, List<Interes> intereses) {
     this.id = id;
     this.client = client;
     this.type = type;
     this.amount = amount;
-    this.banca_interes.add(j);
+    this.banca_interes = intereses;
   }
-  
-  public Banca(String client, String type, Integer amount, Interes j) {
+
+  public Banca(String client, String type, Integer amount, List<Interes> intereses) {
+    this.id = 0;
     this.client = client;
     this.type = type;
     this.amount = amount;
-    this.banca_interes.add(j);
+    this.banca_interes = intereses;
   }
-
 
   public Integer getId() {
     return this.id;
@@ -90,17 +87,14 @@ public class Banca {
   public void setAmount(Integer amount) {
     this.amount = amount;
   }
-  public List<Interes> getBanca_interes() {
-     return this.banca_interes;
-  }
-   public void setBanca_interes(List<Interes> banca_interes) {
-     if(banca_interes == null || banca_interes.size() > 0){
-      this.banca_interes = banca_interes;
-     }
-   }
 
-    public void setBancaInteres(Interes j){
-      this.banca_interes.add(j);
+  public List<Interes> getBanca_interes() {
+    return this.banca_interes;
+  }
+
+  public void setBanca_interes(List<Interes> banca_interes) {
+    if (banca_interes == null || banca_interes.size() > 0) {
+      this.banca_interes = banca_interes;
     }
-  
+  }
 }

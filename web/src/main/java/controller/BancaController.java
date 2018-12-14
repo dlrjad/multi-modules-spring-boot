@@ -32,7 +32,8 @@ public class BancaController {
 
   @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping(path = "/bancos")
-  public List<Banca> getHotels() {
+  protected List<Banca> getHotels() {
+    List<Banca> x = this.service.getAllBanks();
     return this.service.getAllBanks();
   }
 

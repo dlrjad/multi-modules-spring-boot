@@ -2,6 +2,7 @@ package persistence;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -19,47 +20,30 @@ public class dbBanca implements CommandLineRunner {
   
     @Autowired
     private InteresRepository interesRepository;
-  
-  
-  /*public dbBanca(BancaRepository bancaRepository) {
-    this.bancaRepository = bancaRepository;
-  }*/
 
   @Override
   public void run(String... strings) {
-    // Banca santander = new Banca(777777, "Santander", "Corriente", 1200);
-    //santander.setBanca_interes(banca_interes);
-    // Banca santander2 = new Banca(777778, "Caixa", "Corriente", 1300);
-    // Banca santander3 = new Banca(777779, "BBVA", "Ahorro", 1400);
-
-    Interes santa = new Interes(2,2.1f);
-    Interes santa1 = new Interes(1,2.7f);
-
-    //  santander.setInteres(santa);
-    // santander2.setInteres(santa1);
-
-      Banca santander = new Banca(777777, "Santander", "Corriente", 1200, santa);
-    // //santander.setBanca_interes(banca_interes);
-      Banca santander2 = new Banca(777778, "Caixa", "Corriente", 1300, santa1);
-      Banca santander3 = new Banca(777779, "BBVA", "Ahorro", 1400, santa);
-      Banca santander4 = new Banca(777780, "Caja Madrid", "Ahorro", 1500, santa1);
-      Banca santander5 = new Banca(777781, "Caja Rural", "Corriente", 2200, santa);
-
-      
-
-    List<Banca> bancas = new ArrayList<>();
-    bancas.add(santander);
-    bancas.add(santander2);
-    bancas.add(santander3);
-    bancas.add(santander4);
-    bancas.add(santander5);
 
     List<Interes> interes = new ArrayList<>();
-    interes.add(santa);
-    interes.add(santa1);
-    
+    interes.add(new Interes(1,2.7f));
+    interes.add(new Interes(2,2.1f));
+    interes.add(new Interes(3,0.8f));
+    interes.add(new Interes(4,1.5f));
     interes.forEach(e-> this.interesRepository.save(e));
-    bancas.forEach(e -> this.bancaRepository.save(e));
-  }
 
+    String[][] data = new String[][]{{"Santander","Corriente"},{"BBVA","Corriente"},{"La Caixa","Ahorro"},{"Caja 7","Ahorro"}};
+    
+    List<Banca> bancas = new ArrayList<>();
+    for (int i = 0; i < data.length; i++) {
+      bancas.add(new Banca(data[i][0], data[i][1], 1000+(i*100), new ArrayList<Interes>(Arrays.asList(new Interes[]{interes.get(i)}))));
+      
+    }
+    
+    bancas.forEach(e -> {
+      List<Interes> actualIntereses = e.getBanca_interes();
+      actualIntereses.forEach(y -> y.setBanca(e));
+      e.setBanca_interes(actualIntereses);
+      this.bancaRepository.save(e);
+    });
+  }
 }

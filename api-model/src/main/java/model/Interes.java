@@ -2,39 +2,36 @@ package model;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Interes
  */
 
 @Entity
-@Table(name ="Interes")
+@Table(name = "Interes")
 public class Interes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id_interes")
+    @Column(name = "id_interes", unique = true, nullable = false)
     private Integer id_interes;
+
     private Float interes;
+
     private Date fecha;
 
-     //@ManyToOne(cascade = CascadeType.PERSIST, optional = false)
-     //@JoinColumn(name="id", nullable = false)
-
-     @ManyToOne(fetch = FetchType.LAZY)
-     // @JoinColumn(name = "id")
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private Banca banca;
 
     /**
@@ -44,21 +41,23 @@ public class Interes {
         this.id_interes = 0;
         this.interes = null;
         this.fecha = new Date();
-    } 
+    }
 
     /**
      * Constructor con parametros
+     * 
      * @param interes porcentaje de interes
-     * @param date ultima fecha asociada al interes
+     * @param date    ultima fecha asociada al interes
      */
-    public Interes(Integer id,Float interes) {
+    public Interes(Integer id, Float interes) {
         this.id_interes = id;
         this.interes = interes;
         this.fecha = new Date();
     }
 
-     /**
+    /**
      * Obtiene los intereses
+     * 
      * @return interes
      */
     public Float getInteres() {
@@ -72,8 +71,9 @@ public class Interes {
         this.interes = interes;
     }
 
-     /**
+    /**
      * Obtiene la fecha de la transferencia
+     * 
      * @return Date
      */
     public Date getFecha() {
@@ -89,6 +89,7 @@ public class Interes {
 
     /**
      * Obtiene el id_interes
+     * 
      * @return Date
      */
     public Integer getId_interes() {
@@ -96,9 +97,17 @@ public class Interes {
     }
 
     /*
-    * Asigna el id_interes
-    */
+     * Asigna el id_interes
+     */
     public void setId_interes(Integer id_interes) {
         this.id_interes = id_interes;
+    }
+
+    public Banca getBanca() {
+        return this.banca;
+    }
+
+    public void setBanca(Banca banca) {
+        this.banca = banca;
     }
 }
