@@ -15,9 +15,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import model.Banca;
+import model.Transfer;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import org.hamcrest.collection.IsEmptyCollection;
+import org.hamcrest.core.IsEqual;
 
 import persistence.BancaRepository;
 import web.BancaApplication;
@@ -139,6 +143,68 @@ public class BankIntegrationTests {
 	public void testMethodNotAllowedDeleteBank() throws Exception {
     this.mockMvc.perform(delete("/api/banco/"))
     .andExpect(status().isMethodNotAllowed());
+  }
+  
+  @Test
+  public void testGetTypeBank() throws Exception {
+    this.mockMvc.perform(get("/api/bancos/Ahorro"))
+	.andExpect(status().isOk());
+  }
+  
+  @Test
+  public void testNotFoundGetTypeBank() throws Exception {
+    this.mockMvc.perform(get("/api/bancos/Ahorro404"))
+	.andExpect(status().isOk());
+  }
+  
+  @Test
+  public void testTransferBank() throws Exception {
+    Integer id1 = 1;
+	Integer id2 = 2;
+	Double amount = 800.5;
+	Transfer transfer = new Transfer(id1, id2, amount);
+    this.mockMvc.perform(put("/api/banco/transfers")
+    .content(util.asJsonString(transfer))
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON))
+	.andExpect(status().isOk());
+  }
+  
+  @Test
+  public void testNotFoundTransferBank() throws Exception {
+    Integer id1 = 9999;
+	Integer id2 = 2;
+	Double amount = 800.5;
+	Transfer transfer = new Transfer(id1, id2, amount);
+    this.mockMvc.perform(put("/api/banco/transfers")
+    .content(util.asJsonString(transfer))
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON))
+	.andExpect(status().isNotFound());
+  }
+  
+  @Test
+  public void testOPSBank() throws Exception {
+    Integer id = 2;
+	Double amount =  800D;
+    this.mockMvc.perform(put(String.format("/api/banco/%d/ops/%s", id,amount.toString()))
+    .content(util.asJsonString(id))
+    .content(util.asJsonString(amount))
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON))
+	.andExpect(status().isOk());
+  }
+  
+  @Test
+  public void testNotFoundOPSBank() throws Exception {
+    Integer id = 9999;
+	Double amount =  800D;
+    this.mockMvc.perform(put(String.format("/api/banco/%d/ops/%s", id,amount.toString()))
+    .content(util.asJsonString(id))
+    .content(util.asJsonString(amount))
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON))
+	.andExpect(status().isNotFound());
   }
   
 }

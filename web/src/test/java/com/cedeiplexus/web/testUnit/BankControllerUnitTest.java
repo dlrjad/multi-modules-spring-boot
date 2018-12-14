@@ -1,7 +1,10 @@
 package com.cedeiplexus.web.testUnit;
 
+
+
 import static org.mockito.Mockito.when;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +17,10 @@ import org.springframework.http.ResponseEntity;
 
 import controller.BancaController;
 import exceptions.BancaNotFoundException;
+import exceptions.TransferException;
+import exceptions.WithoutFoundsException;
 import model.Banca;
+import model.Transfer;
 import services.BankService;
 
 public class BankControllerUnitTest {
@@ -120,10 +126,91 @@ public class BankControllerUnitTest {
   }
 
   @Test
-  public void itShoulDeleteWithdBadRequestStatusCode() {
+  public void itShoulDeleteWithdInternalServerErrorStatusCode() {
     Integer id = null;
     ResponseEntity<?> httpResponse = bankController.deleteBank(id);
-    Assert.assertEquals(HttpStatus.BAD_REQUEST, httpResponse.getStatusCode());
+    Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldGetTypeWith200StatusCode() {
+	String type = "Corriente";
+	ResponseEntity<?> httpResponse = bankController.getType(type);
+	Assert.assertEquals(HttpStatus.OK, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldGetTypeWithNotFoundStatusCode() {
+	String type = "Corriente";
+	when(this.bankServices.getType(type)).thenThrow(new BancaNotFoundException());
+	ResponseEntity<?> httpResponse = bankController.getType(type);
+	Assert.assertEquals(HttpStatus.NOT_FOUND, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldGetTypeWithBadRequestStatusCode() {
+	String type = null;
+	when(this.bankServices.getType(type)).thenThrow(new NullPointerException());
+	ResponseEntity<?> httpResponse = bankController.getType(type);
+	Assert.assertEquals(HttpStatus.BAD_REQUEST, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldTransferWith200StatusCode() throws ParseException {
+	Integer id1 = 1;
+	Integer id2 = 2;
+	Double amount = 400.5;
+	Transfer transfer = new Transfer(id1, id2, amount);
+	ResponseEntity<?> httpResponse = bankController.transfer(transfer);
+	Assert.assertEquals(HttpStatus.OK, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldTransferWithNotFoundStatusCode() throws BancaNotFoundException, TransferException, Exception {
+	Integer id1 = 9999;
+	Integer id2 = 2;
+	Double amount = 400.5;
+	Transfer transfer = new Transfer(id1, id2, amount);
+	when(this.bankServices.moneyTransfer(transfer)).thenThrow(new BancaNotFoundException());
+	ResponseEntity<?> httpResponse = bankController.transfer(transfer);
+	Assert.assertEquals(HttpStatus.NOT_FOUND, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldTransferWithInternalServerErrorStatusCode() throws BancaNotFoundException, TransferException, Exception {
+	Integer id1 = null;
+	Integer id2 = 2;
+	Double amount = 400.5;
+	Transfer transfer = new Transfer(id1, id2, amount);
+	when(this.bankServices.moneyTransfer(transfer)).thenThrow(new NullPointerException());
+	ResponseEntity<?> httpResponse = bankController.transfer(transfer);
+	Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldOPSWith200StatusCode() {
+	Integer id = 1;
+	Double amount = 400.5;
+	ResponseEntity<?> httpResponse = bankController.ops(id, amount);
+	Assert.assertEquals(HttpStatus.OK, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldOPSWithNotFoundStatusCode() throws BancaNotFoundException, WithoutFoundsException, Exception {
+	Integer id = 9999;
+	Double amount = 400.5;
+	when(this.bankServices.accountOps(id, amount)).thenThrow(new BancaNotFoundException());
+	ResponseEntity<?> httpResponse = bankController.ops(id, amount);
+	Assert.assertEquals(HttpStatus.NOT_FOUND, httpResponse.getStatusCode());
+  }
+  
+  @Test
+  public void itShouldOPSWithInitialServerErrorStatusCode() throws BancaNotFoundException, WithoutFoundsException, Exception {
+	Integer id = null;
+	Double amount = null;
+	when(this.bankServices.accountOps(id, amount)).thenThrow(new NullPointerException());
+	ResponseEntity<?> httpResponse = bankController.ops(id, amount);
+	Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
   }
 
 }

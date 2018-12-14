@@ -33,9 +33,9 @@ public class Banca {
    * @param amount Cantidad de dinero que tiene
    */
   public Banca(Integer id, String client, String type, Double amount) {
-    this.id = id;
+	this.id = id;
     this.client = client;
-    this.type = type;
+    if(type==null) this.type = ""; else this.type = type;
     this.amount = amount;
     this.opsLimit = this.type.equals("Corriente") ? -1000D : null;
   }

@@ -77,8 +77,9 @@ public class BankService {
      * @param toAccount
      * @param totalAmount
      */
-    public void moneyTransfer(Transfer transferRequest) throws BancaNotFoundException,TransferException, Exception{
-        Banca from = this.getAccountById(transferRequest.getFromAccount());
+    public String moneyTransfer(Transfer transferRequest) throws BancaNotFoundException,TransferException, Exception{
+        String res = null;
+    	Banca from = this.getAccountById(transferRequest.getFromAccount());
         Banca to = this.getAccountById(transferRequest.getToAccount());
         if(from == null || to == null){
             throw new BancaNotFoundException();
@@ -98,6 +99,9 @@ public class BankService {
         to.depositMoney(transferRequest.getMoneyToTransfer());
         this.repo.save(from);
         this.repo.save(to);
+        
+        res="OK";
+        return res;
     }
 
 
