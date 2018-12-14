@@ -19,6 +19,10 @@ public class BankService {
     @Autowired
     BancaRepository repo;
 
+    public BankService(BancaRepository bankRepository) {
+        this.repo = bankRepository;
+    }
+
     public List<Banca> getAllBanks() {
         return this.repo.findAll();
     }
