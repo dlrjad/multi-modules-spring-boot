@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -120,7 +119,7 @@ public class BancaController {
 
   @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping("/bancos/{type}")
-  public ResponseEntity<?> getType(@PathVariable String type, RequestEntity<Banca> reqBanca) {
+  public ResponseEntity<?> getType(@PathVariable String type) {
     ResponseEntity<?> res = null;
     try {
       res = new ResponseEntity<List<Banca>>(this.service.getType(type), HttpStatus.OK);
@@ -136,10 +135,10 @@ public class BancaController {
 
   @CrossOrigin(origins = "http://localhost:4200")
   @PutMapping("/banco/transfers")
-  public ResponseEntity<?> transfer(RequestEntity<Transfer> transferRequest) {
+  public ResponseEntity<?> transfer(@RequestBody Transfer transferRequest) {
     ResponseEntity<?> res = null;
     try {
-      this.service.moneyTransfer(transferRequest.getBody());
+      this.service.moneyTransfer(transferRequest);
       res = new ResponseEntity<String>("Transferencia realizada con exito", HttpStatus.OK);
     } catch (BancaNotFoundException e) {
       res = new ResponseEntity<ErrorRest>(new ErrorRest(e.getMessage()), HttpStatus.NOT_FOUND);
