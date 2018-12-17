@@ -163,6 +163,9 @@ public class Banca {
    * @return
    */
   public Double depositMoney(Double canti) {
+    if(this.type.equals("Ahorro")){
+      canti *= this.banca_interes.get(this.banca_interes.size() -1).getInteres();
+    }
     this.amount += canti;
     return this.amount;
   }
