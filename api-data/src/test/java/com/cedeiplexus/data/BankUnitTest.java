@@ -1,13 +1,17 @@
 package com.cedeiplexus.data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import model.Banca;
+import model.Interes;
 
 public class BankUnitTest {
   
-  private Banca bank = new Banca(3242, "Santander", "Corriente", 1200.5);
+  private Banca bank = new Banca(3242, "Santander", "Corriente", 1200.5,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(2,2.3f)})));
 
   @Test
   public void itShouldNotBeNull() {

@@ -1,5 +1,14 @@
 package com.cedeiplexus.web.testIntegration;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import com.cedeiplexus.web.testIntegration.Util.Util;
 
 import org.junit.Before;
@@ -15,21 +24,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import model.Banca;
+import model.Interes;
 import model.Transfer;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.hamcrest.collection.IsEmptyCollection;
-import org.hamcrest.core.IsEqual;
-
 import persistence.BancaRepository;
 import web.BancaApplication;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-  classes = BancaApplication.class
-)
+@SpringBootTest(classes = BancaApplication.class)
 public class BankIntegrationTests {
 
   @Autowired
@@ -75,7 +76,7 @@ public class BankIntegrationTests {
   @Test
 	public void testCreatePostBank() throws Exception {
     Integer id = 9998;
-    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     this.mockMvc.perform(post("/api/banco")    
     .content(util.asJsonString(bank))
     .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +87,7 @@ public class BankIntegrationTests {
   @Test
 	public void testNotCreatePostBank() throws Exception {
     Integer id = 1;
-    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     this.mockMvc.perform(post("/api/banco")    
     .content(util.asJsonString(bank))
     .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +98,7 @@ public class BankIntegrationTests {
   @Test
 	public void testUpdatePutBank() throws Exception {
     Integer id = 1;
-    Banca bank = new Banca(id, "Santander", "Corriente", 9200.5);
+    Banca bank = new Banca(id, "Santander", "Corriente", 9200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     this.mockMvc.perform(put("/api/banco/1")    
     .content(util.asJsonString(bank))
     .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +109,7 @@ public class BankIntegrationTests {
   @Test
 	public void testNotFoundPutBank() throws Exception {
     Integer id = 9999;
-    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     this.mockMvc.perform(put("/api/banco/9999")    
     .content(util.asJsonString(bank))
     .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +120,7 @@ public class BankIntegrationTests {
   @Test
 	public void testMethodNotAllowedPutBank() throws Exception {
     Integer id = 9999;
-    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca bank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     this.mockMvc.perform(put("/api/banco/")    
     .content(util.asJsonString(bank))
     .contentType(MediaType.APPLICATION_JSON)

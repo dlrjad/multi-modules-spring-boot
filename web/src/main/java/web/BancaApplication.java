@@ -7,9 +7,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = {"persistence"})
+@EnableJpaRepositories(basePackages = {"persistence","interes"})
 @EntityScan(basePackages = {"model"})
-@ComponentScan(basePackages = {"persistence", "model", "controller", "services"})
+@ComponentScan(basePackages = {"persistence", "model", "controller", "services","interes"})
 public class BancaApplication {
 
 	public static void main(String[] args) {
