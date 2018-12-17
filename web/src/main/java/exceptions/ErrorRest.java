@@ -1,5 +1,8 @@
 package exceptions;
 
+/**
+ * ErrorRest
+ */
 public class ErrorRest {
 	  
   private String mensaje;

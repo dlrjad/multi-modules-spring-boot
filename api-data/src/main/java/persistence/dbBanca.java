@@ -9,14 +9,20 @@ import org.springframework.stereotype.Component;
 
 import model.Banca;
 
+/**
+ * Clase component dbBanca
+ * Se crean los datos que serán gestionados despues
+ * por la base de datos H2 embebida
+ */
 @Component
 public class dbBanca implements CommandLineRunner {
 
-	@Autowired
-	private BancaRepository bancaRepository;
+  @Autowired
+  private BancaRepository bancaRepository;
 
   @Override
   public void run(String... strings) {
+	
     Banca santander = new Banca(777777, "Santander", "Corriente", 1200D);
     Banca santander2 = new Banca(777778, "Caixa", "Corriente", 1300D);
     Banca santander3 = new Banca(777779, "BBVA", "Ahorro", 1400D);

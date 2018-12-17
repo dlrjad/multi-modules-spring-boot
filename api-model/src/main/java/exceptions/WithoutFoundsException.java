@@ -3,8 +3,7 @@ package exceptions;
 /**
  * WithoutFoundException
  */
-public class WithoutFoundsException extends Exception{
-
+public class WithoutFoundsException extends Exception {
 
     private static final long serialVersionUID = 1L;
 

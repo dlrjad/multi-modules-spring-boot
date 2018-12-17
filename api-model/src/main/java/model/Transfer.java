@@ -3,7 +3,7 @@ package model;
 import java.util.Date;
 
 /**
- * Transfer
+ * Clase entidad Transfer
  */
 public class Transfer {
 
@@ -63,4 +63,5 @@ public class Transfer {
     public Double getMoneyToTransfer() {
         return this.moneyToTransfer;
     }
+    
 }

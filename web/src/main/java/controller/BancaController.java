@@ -22,6 +22,9 @@ import model.Banca;
 import model.Transfer;
 import services.BankService;
 
+/**
+ * Clase controlador BancaController
+ */
 @RestController
 @RequestMapping(path = "/api")
 public class BancaController {
@@ -29,10 +32,18 @@ public class BancaController {
   @Autowired
   private BankService service;
   
+  /**
+   * Constructor del Controlador que tiene dependencia con el servicio bankService
+   * @param bankService
+   */
   public BancaController(BankService bankService) {
 	  this.service = bankService;
   }
 
+  /**
+   * Método GET para obtener todas las cuentas bancarias
+   * @return retorna todas las cuentas bancarias en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping(path = "/bancos")
   public ResponseEntity<?> getBanks() {
@@ -47,6 +58,11 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método GET para obtener una cuenta bancaria filtrando por su ID (número de cuenta)
+   * @param id
+   * @return retorna una cuenta bancaria en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping("/banco/{id}")
   public ResponseEntity<?> getBankById(@PathVariable Integer id) {
@@ -64,6 +80,11 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método POST para crear una cuenta bancaria
+   * @param banca
+   * @return retorna una cuenta bancaria creado en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @PostMapping("/banco")
   public ResponseEntity<?> createBank(@RequestBody Banca banca) {
@@ -81,6 +102,12 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método PUT para actualizar una cuenta bancaria filtrando por su ID (número de cuenta)
+   * @param id
+   * @param reqBanca
+   * @return retorna una cuenta bancaria actualizado en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @PutMapping("/banco/{id}")
   public ResponseEntity<?> updateBank(@PathVariable Integer id, @RequestBody Banca reqBanca) {
@@ -100,6 +127,11 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método DELETE que eliminar una cuenta bancaria filtrando por su ID (número de cuenta)
+   * @param id
+   * @return retorna un mensaje indicando cuenta bancaria eliminada en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @DeleteMapping("/banco/{id}")
   public ResponseEntity<?> deleteBank(@PathVariable Integer id) {
@@ -117,6 +149,11 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método GET para obtener una lista de cuentas bancarias filtrando por un tipo de cuenta (ahorro/corriente)
+   * @param type
+   * @return retorna una lista de cuentas bancarias en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping("/bancos/{type}")
   public ResponseEntity<?> getType(@PathVariable String type) {
@@ -133,6 +170,11 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método PUT para actualizar cuenta bancaria al realizar una transferencia
+   * @param transferRequest
+   * @return retorna un mensaje indicando que la transferencia se ha realizado en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @PutMapping("/banco/transfers")
   public ResponseEntity<?> transfer(@RequestBody Transfer transferRequest) {
@@ -148,6 +190,12 @@ public class BancaController {
     return res;
   }
 
+  /**
+   * Método PUT para actualizar una cuenta bancaria al realizar una operación (deposito/extracción)
+   * @param account
+   * @param canti
+   * @return retorna una cuenta bancaria actualizada en caso de éxito
+   */
   @CrossOrigin(origins = "http://localhost:4200")
   @PutMapping("/banco/{account}/ops/{canti}")
   public ResponseEntity<?> ops(@PathVariable Integer account, @PathVariable Double canti) {
@@ -164,4 +212,5 @@ public class BancaController {
 
     return res;
   }
+
 }

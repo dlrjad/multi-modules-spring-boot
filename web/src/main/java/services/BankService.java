@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * BankService
+ * Clase servicio BankService
  */
 @Service
 public class BankService {
@@ -22,19 +22,35 @@ public class BankService {
     @Autowired
     BancaRepository repo;
 
+    /**
+     * Constructor del Servicio que tiene dependencia con el repositorio bankRepository
+     * @param bankRepository
+     */
     public BankService(BancaRepository bankRepository) {
         this.repo = bankRepository;
     }
 
+    /**
+     * Método para encontrar todas las cuentas bancarias
+     * @return
+     */
     public List<Banca> getAllBanks() {
         return this.repo.findAll();
     }
 
+    /**
+     * Método para buscar una cuenta bancaria por su ID (número de cuenta)
+     * @param id
+     * @return
+     */
     public Banca getAccountById(Integer id) {
         Optional<Banca> foundedResult = this.repo.findById(id);
         return foundedResult.isPresent() ? foundedResult.get() : null;
     }
 
+    /**
+     * Método para crear una cuenta bancaria
+     */
     public Banca createAccount(Banca model) throws Exception {
         if (this.getAccountById(model.getId()) != null) {
             throw new Exception();
@@ -42,6 +58,13 @@ public class BankService {
         return this.repo.save(model);
     }
 
+    /**
+     * Método para actualizar una cuenta bancaria filtrada por su ID (número de cuenta)
+     * En caso de no existir lanzará la excepción BancaNotFoundException
+     * @param model
+     * @return
+     * @throws BancaNotFoundException
+     */
     public Banca updateAccount(Banca model) throws BancaNotFoundException {
         Banca updated = getAccountById(model.getId());
         if (updated == null) {
@@ -54,6 +77,14 @@ public class BankService {
         return this.repo.save(updated);
     }
 
+    /**
+     * Méotodo para eliminar un número de cuenta bancaria
+     * En caso de no existir lanzará la excepción BancaNotFoundException
+     * @param id
+     * @return
+     * @throws BancaNotFoundException
+     * @throws Exception
+     */
     public String removeAccount(Integer id) throws BancaNotFoundException, Exception {
         if (this.getAccountById(id) == null) {
             throw new BancaNotFoundException();
@@ -68,9 +99,15 @@ public class BankService {
         return resu;
     }
 
+    /**
+     * Método para encontrar todas la cuentas filtrada por un tipo de cuenta (ahorro/corriente)
+     * @param type
+     * @return
+     */
     public List<Banca> getType(String type) {
         return this.repo.findByType(type);
     }
+    
     /**
      * Realiza una transferencia entre dos cuentas
      * @param fromAccount

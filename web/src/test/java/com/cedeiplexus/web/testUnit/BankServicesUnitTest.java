@@ -42,7 +42,7 @@ public class BankServicesUnitTest {
 
   @Test
   public void itShoulGetAllBanks() {
-    List<Banca> banks = bankServices.getAllBanks();
+    bankServices.getAllBanks();
     if (this.banks.size() < 1) {
       fail("There are accounts");
     }

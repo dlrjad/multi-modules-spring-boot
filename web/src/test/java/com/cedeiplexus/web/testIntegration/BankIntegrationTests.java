@@ -20,9 +20,6 @@ import model.Transfer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.hamcrest.collection.IsEmptyCollection;
-import org.hamcrest.core.IsEqual;
-
 import persistence.BancaRepository;
 import web.BancaApplication;
 

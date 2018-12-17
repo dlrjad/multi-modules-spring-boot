@@ -7,6 +7,9 @@ import javax.persistence.Id;
 
 import exceptions.WithoutFoundsException;
 
+/**
+ * Clase entidad Banca
+ */
 @Entity
 public class Banca {
 

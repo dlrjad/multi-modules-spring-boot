@@ -3,6 +3,9 @@ package exceptions;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 
+/**
+ * BancaNotFoundException
+ */
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class BancaNotFoundException extends RuntimeException {
   private static final long serialVersionUID = -7295910574475009536L;
