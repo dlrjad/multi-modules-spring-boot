@@ -58,7 +58,7 @@ public class BankServicesUnitTest {
   private void setUpBanks(){
     banks.add(new Banca(1, "Santander", "Corriente", 9200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
     banks.add(new Banca(2, "BBVA", "Corriente", 1000D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
-    banks.add(new Banca(3, "La Caixa", "Ahorro", 1050D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
+    banks.add(new Banca(3, "La Caixa", "Ahorro", 1200D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
     
     this.bankRepository = Mockito.mock(BancaRepository.class);
     this.bankServices = new BankService(bankRepository);
@@ -252,10 +252,17 @@ public class BankServicesUnitTest {
   /* Accounts operations tests */
 
   @Test
-  public void itShouldOKDepositmoney() throws BancaNotFoundException, WithoutFoundsException, Exception {
+  public void itShouldOKDepositmoneyCorrienteAccount() throws BancaNotFoundException, WithoutFoundsException, Exception {
     Banca updatedValues = this.bankServices.accountOps(2, 20D);
     Double expected = 1020D;
     Assert.assertEquals(expected, updatedValues.getAmount());
+  }
+
+  @Test
+  public void itShouldOKDepositMoneyAhorroAccount() throws BancaNotFoundException, WithoutFoundsException, Exception {
+    Banca updateValues = this.bankServices.accountOps(3, 20D);
+    Double expected = 1250D;
+    Assert.assertEquals(expected, updateValues.getAmount());
   }
 
   @Test
