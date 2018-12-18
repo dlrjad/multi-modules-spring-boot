@@ -6,6 +6,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <artifactId>banca</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
   <artifactId>api-model</artifactId>
+  <name>api-model</name>
   <packaging>jar</packaging>
+  
 </project>

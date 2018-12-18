@@ -5,14 +5,16 @@
     <artifactId>banca</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
   <artifactId>api-data</artifactId>
+  <name>api-data</name>
   <packaging>jar</packaging>
   
   <dependencies>
   	<dependency>
   		<groupId>com.cedeiplexus</groupId>
 	    <artifactId>api-model</artifactId>
-	    <version>0.0.1-SNAPSHOT</version>
+	    <version>${project.version}</version>
   	</dependency>
   </dependencies>
 </project>
