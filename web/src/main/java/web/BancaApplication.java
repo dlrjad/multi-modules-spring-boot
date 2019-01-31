@@ -17,9 +17,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * de cada módulo: api-model, api-data y web
  */
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = { "persistence" })
-@EntityScan(basePackages = { "model" })
-@ComponentScan(basePackages = {"persistence", "model", "controller", "services" })
+@EnableJpaRepositories(basePackages = {"persistence","interes"})
+@EntityScan(basePackages = {"model"})
+@ComponentScan(basePackages = {"persistence", "model", "controller", "services","interes"})
 public class BancaApplication {
 
 	public static void main(String[] args) {

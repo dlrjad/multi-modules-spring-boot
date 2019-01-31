@@ -4,6 +4,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,29 +16,52 @@ import org.mockito.Mockito;
 import exceptions.BancaNotFoundException;
 import exceptions.TransferException;
 import exceptions.WithoutFoundsException;
+import interes.InteresRepository;
 import model.Banca;
+import model.Interes;
 import model.Transfer;
 import persistence.BancaRepository;
 import services.BankService;
+import services.InteresService;
 
 public class BankServicesUnitTest {
 
   private BancaRepository bankRepository;
+  private InteresRepository interesRepository;
   private BankService bankServices;
+  private InteresService interesService;
 
   private List<Banca> banks = new ArrayList<>();
+  private List<Interes> intereses = new ArrayList<>();
 
   @Before
   public void setUp() {
-    banks.add(new Banca(1, "Santander", "Corriente", 9200.5));
-    banks.add(new Banca(2, "BBVA", "Corriente", 1000D));
-    banks.add(new Banca(3, "La Caixa", "Ahorro", 1050D));
-    bankRepository = Mockito.mock(BancaRepository.class);
+    this.setUpBanks();
     when(bankRepository.findAll()).thenReturn(banks);
     when(bankRepository.findById(1)).thenReturn(Optional.of(this.banks.get(0)));
     when(bankRepository.findById(2)).thenReturn(Optional.of(this.banks.get(1)));
     when(bankRepository.findById(3)).thenReturn(Optional.of(this.banks.get(2)));
-    bankServices = new BankService(bankRepository);
+
+    this.setUpInteres();
+    when(this.interesRepository.findAll()).thenReturn(this.intereses);
+  }
+  
+  private void setUpInteres(){
+    this.intereses.add(new Interes(1,2.3F));
+    this.intereses.add(new Interes(2,1.5F));
+    this.intereses.add(new Interes(3,0.8F));
+
+    this.interesRepository = Mockito.mock(InteresRepository.class);
+    this.interesService = new InteresService(this.interesRepository);
+  }
+  
+  private void setUpBanks(){
+    banks.add(new Banca(1, "Santander", "Corriente", 9200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
+    banks.add(new Banca(2, "BBVA", "Corriente", 1000D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
+    banks.add(new Banca(3, "La Caixa", "Ahorro", 1200D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)}))));
+    
+    this.bankRepository = Mockito.mock(BancaRepository.class);
+    this.bankServices = new BankService(bankRepository);
   }
 
   @Test
@@ -65,7 +89,7 @@ public class BankServicesUnitTest {
   @Test
   public void itShoulCreateBank() throws Exception {
     Integer id = 9998;
-    Banca newBank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca newBank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     when(this.bankRepository.save(newBank)).thenReturn(newBank);
     Banca bank = bankServices.createAccount(newBank);
     Assert.assertEquals(newBank, bank);
@@ -74,7 +98,7 @@ public class BankServicesUnitTest {
   @Test
   public void itNotShoulCreateBank() throws Exception {
     Integer id = 1;
-    Banca newBank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca newBank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     try {
       bankServices.createAccount(newBank);
       fail("Fail test");
@@ -95,7 +119,7 @@ public class BankServicesUnitTest {
   @Test
   public void itNotShoulUpdateBank() throws Exception {
     Integer id = 9999;
-    Banca updatedBank = new Banca(id, "Santander", "Corriente", 1200.5);
+    Banca updatedBank = new Banca(id, "Santander", "Corriente", 1200.5D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.5F)})));
     try {
       bankServices.updateAccount(updatedBank);
       fail("Fail test");
@@ -128,7 +152,7 @@ public class BankServicesUnitTest {
   public void itShouldGetAccountType() {
     String type = "Ahorro";
     List<Banca> results = new ArrayList<>();
-    results.add(new Banca(3, "BBVA", "Ahorro", 14000D));
+    results.add(new Banca(3, "BBVA", "Ahorro", 14000D,new ArrayList<Interes>(Arrays.asList(new Interes[]{new Interes(1,2.3F)}))));
     when(this.bankRepository.findByType(type)).thenReturn(results);
     List<Banca> repositoryAccounts = this.bankServices.getType(type);
     Assert.assertEquals(results, repositoryAccounts);
@@ -228,10 +252,17 @@ public class BankServicesUnitTest {
   /* Accounts operations tests */
 
   @Test
-  public void itShouldOKDepositmoney() throws BancaNotFoundException, WithoutFoundsException, Exception {
+  public void itShouldOKDepositmoneyCorrienteAccount() throws BancaNotFoundException, WithoutFoundsException, Exception {
     Banca updatedValues = this.bankServices.accountOps(2, 20D);
     Double expected = 1020D;
     Assert.assertEquals(expected, updatedValues.getAmount());
+  }
+
+  @Test
+  public void itShouldOKDepositMoneyAhorroAccount() throws BancaNotFoundException, WithoutFoundsException, Exception {
+    Banca updateValues = this.bankServices.accountOps(3, 20D);
+    Double expected = 1250D;
+    Assert.assertEquals(expected, updateValues.getAmount());
   }
 
   @Test
@@ -277,4 +308,12 @@ public class BankServicesUnitTest {
     }
   }
 
+  /* Test de tipos de intereses*/
+  @Test
+  public void itShouldgetAllInteres() {
+    List<Interes> interes = this.interesService.getAllInteres();
+    if (interes.size() < 1) {
+      fail("There are accounts");
+    }
+  }
 }
