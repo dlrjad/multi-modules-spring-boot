@@ -2,7 +2,6 @@ package com.cedeiplexus.data;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import model.Banca;
 
 public class BankUnitTest {

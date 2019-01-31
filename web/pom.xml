@@ -11,8 +11,8 @@
   <artifactId>web</artifactId>
   <name>web</name>
   <packaging>jar</packaging>
-  
-  <dependencies>
+
+	<dependencies>
 		<dependency>
 			<groupId>com.cedeiplexus</groupId>
 			<artifactId>api-model</artifactId>
@@ -22,6 +22,6 @@
 			<groupId>com.cedeiplexus</groupId>
 			<artifactId>api-data</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 	</dependencies>	
 </project>
