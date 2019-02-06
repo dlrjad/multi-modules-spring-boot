@@ -1,4 +1,4 @@
-package com.cedeiplexus.data;
+/*package com.cedeiplexus.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,4 +38,4 @@ public class BankUnitTest {
     Assert.assertEquals(1200.5, bank.getAmount(), errorMargin);
   }
 
-}
+}*/

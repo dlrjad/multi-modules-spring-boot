@@ -47,7 +47,6 @@ public class Interes {
      * Constructor con parametros
      * 
      * @param interes porcentaje de interes
-     * @param date    ultima fecha asociada al interes
      */
     public Interes(Integer id, Float interes) {
         this.id_interes = id;

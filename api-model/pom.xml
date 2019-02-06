@@ -11,4 +11,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <name>api-model</name>
   <packaging>jar</packaging>
   
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-actuator</artifactId>
+	</dependency>
+  </dependencies>
+  
 </project>

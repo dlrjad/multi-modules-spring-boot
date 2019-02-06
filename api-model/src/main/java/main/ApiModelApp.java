@@ -8,12 +8,12 @@ import org.springframework.context.annotation.ComponentScan;
 import model.Banca;
 
 @SpringBootApplication
-/*@EntityScan(basePackages = { "model" })
-@ComponentScan(basePackages = { "model", "exceptions" })*/
+@EntityScan(basePackages = { "model" })
+@ComponentScan(basePackages = { "model", "exceptions" })
 public class ApiModelApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(Banca.class, args);
+        SpringApplication.run(ApiModelApp.class, args);
     }
 
 }
